@@ -11,10 +11,21 @@ def load_files_list(path):
 
 
 def all_in_one(files_list):
-    dfs = [pd.read_csv(file) for file in files_list]
+    dfs = [pd.read_csv(
+        file, usecols=['artist',
+                       'firstName',
+                       'gender',
+                       'itemInSession',
+                       'lastName',
+                       'length',
+                       'level',
+                       'location',
+                       'sessionId',
+                       'song',
+                       'userId']
+    ) for file in files_list]
     concat_df = pd.concat(dfs).reset_index(drop=True)
     concat_df.to_csv("event_datafile_new.csv", index=False)
-
 
 # TODO:  Load data from Snowflake
 
