@@ -1,6 +1,23 @@
 import os
 import pandas as pd
+from functools import wraps
 
+from cassandra.cluster import Cluster
+
+
+def cassandra_connection(ip, keyspace):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            cluster = Cluster([ip])
+            session = cluster.connect(keyspace)
+            try:
+                return func(session, cluster, *args, **kwargs)
+            finally:
+                session.shutdown()
+                cluster.shutdown()
+        return wrapper
+    return decorator
 def load_files_list(path):
     files_list = []
     for root, dirs, files in os.walk(path):
