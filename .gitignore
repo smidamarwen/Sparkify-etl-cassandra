@@ -81,3 +81,4 @@ event_datafile_new.csv
 venv/
 .lastactionnote
 cassandra_data/
+__pycache__/
