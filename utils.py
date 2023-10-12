@@ -87,8 +87,8 @@ def create_songs_by_sessionId(session, keyspace='my_keyspace_test'):
     print('Table created')
     # Prepare data to be loaded into the table
     df = load_data(fields=['sessionId', 'itemInSession', 'artist', 'song', 'length'])
-    query = '''INSERT INTO %s.songs_by_sessionID(sessionID, itemInSession, artist, song, length) 
-                VALUES (?,?,?,?,?)''' % keyspace
+    query = '''INSERT INTO '''+ keyspace +''''.songs_by_sessionID(sessionID, itemInSession, artist, song, length) 
+                VALUES (?,?,?,?,?)'''
     preparedStatement = session.prepare(query)
     df['song'] = df['song'].fillna('Empty Song')
     df['length'] = df['length'].fillna(0)
@@ -96,3 +96,33 @@ def create_songs_by_sessionId(session, keyspace='my_keyspace_test'):
 
     for item in df.iterrows():
         session.execute(preparedStatement, (item[1]["sessionId"],item[1]["itemInSession"], item[1]["artist"], item[1]["song"], item[1]["length"]))
+
+
+@cassandra_connection('localhost')
+def create_table_info_by_userid(session, keyspace='my_keyspace_test'):
+    set_keyspace(keyspace)
+    session.execute(create_table_2 % keyspace)
+    print('Table created')
+    df = load_data(fields=['userId', 'sessionId', 'itemInSession', 'artist', 'song', 'firstName', 'lastName'])
+    query = '''INSERT INTO info_by_userid(userId,sessionID, itemInSession, artist, song, firstName,lastName)
+                            VALUES (?,?,?,?,?,?,?) '''
+    session.execute("USE " + keyspace)
+    preparedStatement = session.prepare(query)
+    df['userId'] = df['userId'].astype('Int64').fillna(0)
+    df['song'] = df['song'].fillna('Empty Song')
+    df['artist'] = df['artist'].fillna('Empty Artist')
+    df['firstName'] = df['firstName'].fillna('Empty FirstName')
+    df['lastName'] = df['lastName'].fillna('Empty LastName')
+    print("Df prepared")
+    print(df.isna().sum())
+    for item in df.iterrows():
+        result = session.execute(preparedStatement, (
+        item[1]["userId"],
+        item[1]["sessionId"],
+        item[1]["itemInSession"],
+        item[1]["artist"],
+        item[1]["song"],
+        item[1]["firstName"],
+        item[1]["lastName"],))
+
+
