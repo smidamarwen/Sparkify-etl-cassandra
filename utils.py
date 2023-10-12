@@ -77,3 +77,22 @@ def load_data(fields):
         'event_datafile_new.csv', usecols=fields
     )
     return df
+
+
+@cassandra_connection('localhost')
+def create_songs_by_sessionId(session, keyspace='my_keyspace_test'):
+    set_keyspace(keyspace)
+    # Create table songs_by_sessionID
+    session.execute(create_table_1 % keyspace)
+    print('Table created')
+    # Prepare data to be loaded into the table
+    df = load_data(fields=['sessionId', 'itemInSession', 'artist', 'song', 'length'])
+    query = '''INSERT INTO %s.songs_by_sessionID(sessionID, itemInSession, artist, song, length) 
+                VALUES (?,?,?,?,?)''' % keyspace
+    preparedStatement = session.prepare(query)
+    df['song'] = df['song'].fillna('Empty Song')
+    df['length'] = df['length'].fillna(0)
+    df['artist'] = df['artist'].fillna('Empty Artist')
+
+    for item in df.iterrows():
+        session.execute(preparedStatement, (item[1]["sessionId"],item[1]["itemInSession"], item[1]["artist"], item[1]["song"], item[1]["length"]))
