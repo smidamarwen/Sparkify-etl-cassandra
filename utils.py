@@ -55,3 +55,25 @@ def all_in_one(files_list):
 
 # TODO:  Load data from Snowflake
 
+# Create cassandra keyspace
+@cassandra_connection('localhost')
+def create_keyspace(session, keysapce, strategy='SimpleStrategy', replication_factor=1):
+    '''
+    strategy = 'SimpleStrategy' | 'NetworkTopologyStrategy'
+    '''
+    session.execute(
+        """CREATE KEYSPACE IF NOT EXISTS %s
+         WITH replication = {'class': '%s', 
+         'replication_factor': %s};""" % (keysapce, strategy, replication_factor))
+
+
+@cassandra_connection('localhost')
+def set_keyspace(session, keyspace):
+    session.set_keyspace(keyspace)
+
+
+def load_data(fields):
+    df = pd.read_csv(
+        'event_datafile_new.csv', usecols=fields
+    )
+    return df
