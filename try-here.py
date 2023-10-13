@@ -15,8 +15,6 @@ from utils import *
 #     session.execute(preparedStatement, (item[1]["sessionId"], item[1]["artist"], item[1]["song"], item[1]["length"]))
 
 
-whole = pd.read_csv(
-        'event_datafile_new.csv')
+
 # nan_counts = whole.isna().sum()
-df = whole[whole['firstName'] == 'Sylvie']
 create_table_info_by_userid()

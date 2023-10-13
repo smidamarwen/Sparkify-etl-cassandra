@@ -69,6 +69,7 @@ def create_keyspace(session, keysapce, strategy='SimpleStrategy', replication_fa
 
 @cassandra_connection('localhost')
 def set_keyspace(session, keyspace):
+    create_keyspace(keyspace)
     session.set_keyspace(keyspace)
 
 
@@ -116,7 +117,7 @@ def create_table_info_by_userid(session, keyspace='my_keyspace_test'):
     print("Df prepared")
     print(df.isna().sum())
     for item in df.iterrows():
-        result = session.execute(preparedStatement, (
+        session.execute(preparedStatement, (
         item[1]["userId"],
         item[1]["sessionId"],
         item[1]["itemInSession"],

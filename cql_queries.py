@@ -18,5 +18,5 @@ create_table_2 = """CREATE TABLE IF NOT EXISTS %s.info_by_userid (
         song TEXT,
         firstName TEXT,
         lastName TEXT,
-        PRIMARY KEY (userId, sessionID)
+        PRIMARY KEY (userId, sessionID, itemInSession)
     );"""
